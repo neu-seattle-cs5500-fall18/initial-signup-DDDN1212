@@ -1,15 +1,22 @@
 from game_app import db
 
 
-class Game(db.model):
-    game_id = db.column(db.Integer, primary_key=True)
-    word = db.column(db.String, nullable=False)
+class Game(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.String)
     guesses = db.relationship('Guesses', backref='Game', lazy=True)
-    correct_guesses = db.column(db.ARRAY(db.CHAR))
-    max_guesses = db.column(db.SmallInteger, nullable=False, default=5)
-    game_over = db.column(db.Boolean, nullable=False, default=False)
+    correct_guesses = db.Column(db.ARRAY(db.CHAR))
+    max_guesses = db.Column(db.SmallInteger)
+    game_over = db.Column(db.Boolean)
 
-    class Guesses(db.model):
+    def __repr__(self):
+        return '<Game %r>' % self.id
+
+    class Guesses(db.Model):
         id = db.Column(db.Integer, primary_key=True)
-        game_id = db.Column(db.Integer, db.ForeignKey('game.game_id'), nullable=False)
+        game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
         guess = db.Column(db.String, nullable=False)
+
+        def __repr__(self):
+            return '<Guess ID %r>' % self.id
+
