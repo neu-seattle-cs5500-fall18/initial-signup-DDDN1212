@@ -1,8 +1,10 @@
+from db_globals import DB_URI
 from flask import Flask
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 db = SQLAlchemy(app)
 db.create_all()
 
