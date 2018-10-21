@@ -45,26 +45,25 @@ class Game(Resource):
         :param game_id:
         :return: JSON of Game Object
         """
-        return "Got State"
-        #get_game(id)
+        return get_game(game_id)
 
 
-@api.route('/games/<game_id>/guesses/<letter>')
+@api.route('/<game_id>/guesses/<letter>')
 @api.doc(params={'game_id': 'Record for an instance of a game.', 'letter': 'Letter user guessed'})
 class Guess(Resource):
     @api.response(404, 'Cannot find game.  If you entered id manually please check and try again. ')
     @api.response(201, 'Created Guess.')
     @api.marshal_with(game, code=201)
-    def post(self):
+    def post(self, game_id, letter):
         """
         Create a guess.
         :return: game.
         """
-        return "Posted guess"
+        return make_guess(game_id, letter)
 
 
 @api.route('/<game_id>/guesses')
-@api.doc(params={'game_id': 'Record for an instance of a game.'})
+@api.doc(params={'game_id': 'Record for an instance of a game.', 'letter': 'Letter user guessed'})
 class Guesses(Resource):
     @api.response(404, 'Cannot find game.  If you entered id manually please check and try again. ')
     @api.response(200, 'Got Guesses for game id')
@@ -74,5 +73,4 @@ class Guesses(Resource):
         :param id:
         :return:
         """
-        return "Got Guesses"
-            #get_guesses(id)
+        return get_guesses(game_id)
