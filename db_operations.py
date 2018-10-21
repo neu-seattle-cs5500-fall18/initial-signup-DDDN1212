@@ -5,7 +5,7 @@ from game_app import db
 def new_game():
     a_game = Game(word='Word')
     db.session.add(a_game)
-    return a_game.game_id
+    return a_game
 
 
 def get_game(record):
