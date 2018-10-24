@@ -1,4 +1,4 @@
-from db_operations import new_game, get_game, get_guesses, make_guess
+from db_operations import new_game, get_game, get_guesses, make_guess, is_valid, get_all_games
 from flask_restplus import Namespace, Resource, fields
 
 api = Namespace('games')
@@ -8,20 +8,21 @@ game = api.model('Game', {
     'guesses': fields.List(fields.String),
     'correct_guesses': fields.List(fields.String),
     'max_guesses': fields.Integer(),
+    'message': fields.String(),
     'game_over': fields.Boolean(),
 })
 
 
 @api.response(400, 'Validation Error')
 @api.route('/start')
-class Games(Resource):
+class Start(Resource):
     @api.response(200, 'Success')
     def get(self):
         """
         Landing for a new game.
         :return:
         """
-        return "Start a game"
+        return "Welcome to Hangman", 200
 
     @api.response(201, 'Created New Game.')
     @api.marshal_with(game, code=201)
@@ -30,8 +31,12 @@ class Games(Resource):
         Creates a new Game
         :return: ID of newly created resource
         """
-        return new_game()
+        return new_game(), 201
 
+@api.route('')
+class Games(Resource):
+    def get(self):
+        return get_all_games(), 200
 
 @api.route('/<game_id>')
 @api.doc(params={'game_id': 'Record for an instance of a game.'})
@@ -45,12 +50,13 @@ class Game(Resource):
         :param game_id:
         :return: JSON of Game Object
         """
-        return get_game(game_id)
+        return get_game(game_id), 200
 
 
 @api.route('/<game_id>/guesses/<letter>')
 @api.doc(params={'game_id': 'Record for an instance of a game.', 'letter': 'Letter user guessed'})
 class Guess(Resource):
+    @api.response(400, 'Invalid input')
     @api.response(404, 'Cannot find game.  If you entered id manually please check and try again. ')
     @api.response(201, 'Created Guess.')
     @api.marshal_with(game, code=201)
@@ -59,7 +65,11 @@ class Guess(Resource):
         Create a guess.
         :return: game.
         """
-        return make_guess(game_id, letter)
+        if is_valid(letter):
+            letter = letter.casefold()
+            return make_guess(game_id, letter), 201
+        else:
+            return 400
 
 
 @api.route('/<game_id>/guesses')
@@ -73,4 +83,4 @@ class Guesses(Resource):
         :param id:
         :return:
         """
-        return get_guesses(game_id)
+        return get_guesses(game_id), 200
